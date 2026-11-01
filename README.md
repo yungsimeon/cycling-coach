@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cycling Coach
 
-## Getting Started
+AI-powered cycling training: upload your rides, get them rated, get workout suggestions, and see your fitness develop.
 
-First, run the development server:
+## Getting started
+
+Requires Node, pnpm, Docker and the Supabase CLI.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+supabase start              # starts local Postgres, auth and storage in Docker
+cp .env.example .env.local  # then paste the URL and key from `supabase status`
+pnpm dev                    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The local Supabase dashboard runs at http://localhost:54323.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Roadmap
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Foundation:** auth (sign up / sign in), user profile with FTP and max heart rate
+2. **Ride upload:** upload .FIT files, parse them, store rides and data streams
+3. **Ride analysis:** power and heart-rate zones, normalized power, TSS, charts
+4. **Fitness tracking:** fitness/fatigue/form (CTL/ATL/TSB) over time
+5. **AI ride rating:** LLM feedback on each ride, with prompt tuning, evals and guardrails
+6. **AI workout suggestions:** next workouts based on goals and current form
+7. **Real users:** deploy, get feedback from other cyclists, iterate
+8. **Later:** Strava sync, Expo mobile app, Python analytics/ML
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/app/         Next.js pages and routes (thin layer)
+src/lib/         domain logic in plain TypeScript, reusable by a future mobile app
+supabase/        local Supabase config and database migrations
+```
