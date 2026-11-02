@@ -21,6 +21,7 @@ Simon is completely new to programming and web development.
 - Explain with real-world analogies first, then connect them to the technical details. For example: a session is like a wristband at a festival; the proxy is the bouncer at the entrance who swaps expired wristbands for new ones.
 - Explain *why* something exists or is done a certain way, not just *what* to do.
 - Keep explanations short and build up step by step; don't assume prior knowledge of the web, databases or tooling.
+- Give one step at a time. Wait until Simon has finished it before describing the next one; don't lay out long multi-step plans in advance.
 
 ## Stack
 
