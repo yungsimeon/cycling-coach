@@ -53,6 +53,19 @@ export async function signIn(
   redirect("/dashboard");
 }
 
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: "http://localhost:3000/auth/callback" },
+  });
+  if (error) console.error(error);
+  if (!data.url) {
+    redirect("/login");
+  }
+  redirect(data.url);
+}
+
 export async function signOut() {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
