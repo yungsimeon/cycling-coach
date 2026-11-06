@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import ProfileForm from "./profile-form";
 
 export default function ProfilePage() {
   return (
@@ -21,6 +22,7 @@ async function ProfileDetails() {
   if (!data) return <p>Couldn&apos;t load profile</p>;
   return (
     <div>
+      <ProfileForm ftp={data.ftp} maxHr={data.max_hr} />
       <p>FTP: {data.ftp ?? "Not set"}</p>
       <p>Max Heart Rate: {data.max_hr ?? "Not set"}</p>
     </div>
