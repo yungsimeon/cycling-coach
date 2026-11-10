@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { Decoder, Stream } from "@garmin/fitsdk";
 import { parseFit } from "../src/lib/fit/parse.ts";
 import { averagePower, normalizedPower } from "../src/lib/metrics/power.ts";
+import { timeInPowerZones } from "../src/lib/metrics/zones.ts";
 
 const path = "fixtures/fit/power_and_hr.fit";
 const buffer = readFileSync(path);
@@ -18,6 +19,6 @@ const session = messages?.sessionMesgs?.[0];
 // console.log(session);
 
 const ride = parseFit(buffer);
-console.log(normalizedPower(ride.samples));
-
+//console.log(normalizedPower(ride.samples));
+console.log(timeInPowerZones(ride.samples, 340));
 //console.log(averagePower())
