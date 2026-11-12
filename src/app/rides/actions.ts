@@ -1,11 +1,17 @@
 "use server";
 
 import { parseFit } from "@/lib/fit/parse";
+import type { Ride } from "@/lib/fit/types";
 import { calculateRideMetrics } from "@/lib/metrics/ride-metrics";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export async function uploadRide(formData: FormData): Promise<void> {
+export type UploadRideState = { error: string } | undefined;
+
+export async function uploadRide(
+  prevState: UploadRideState,
+  formData: FormData,
+): Promise<UploadRideState> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,15 +26,22 @@ export async function uploadRide(formData: FormData): Promise<void> {
     .eq("id", user.id)
     .single();
   if (profileError) {
-    throw new Error("Error loading profile", { cause: profileError });
+    console.error(profileError);
+    return { error: "Something went wrong, please try again." };
   }
   const ftp = profile.ftp;
 
   const file = formData.get("file");
   if (!(file instanceof File)) throw new Error("Input is not a file.");
-  if (file.size === 0) return;
+  if (file.size === 0) return { error: "Please choose a FIT file." };
   const fileContent = new Uint8Array(await file.arrayBuffer());
-  const ride = parseFit(fileContent);
+  let ride: Ride;
+  try {
+    ride = parseFit(fileContent);
+  } catch (error) {
+    console.error(error);
+    return { error: "This doesn't look like a valid FIT file." };
+  }
 
   const rideMetrics = calculateRideMetrics(ride, ftp);
 
@@ -36,8 +49,10 @@ export async function uploadRide(formData: FormData): Promise<void> {
   const { error: uploadError } = await supabase.storage
     .from("fit-files")
     .upload(path, file);
-  if (uploadError)
-    throw new Error("Couldn't upload file", { cause: uploadError });
+  if (uploadError) {
+    console.error(uploadError);
+    return { error: "Couldn't upload your file. Please try again." };
+  }
 
   const { error: insertError } = await supabase.from("rides").insert({
     user_id: user.id,
@@ -56,14 +71,16 @@ export async function uploadRide(formData: FormData): Promise<void> {
     fit_file_path: path,
   });
   if (insertError) {
+    console.error(insertError);
     const { error: removeError } = await supabase.storage
       .from("fit-files")
       .remove([path]);
-    if (removeError)
+    if (removeError) {
       console.error("Couldn't remove orphaned file", path, removeError);
-
-    throw new Error("Couldn't save ride", { cause: insertError });
+    }
+    return { error: "Couldn't save your ride. Please try again." };
   }
+  return undefined;
 }
 
 function roundOrNull(value: number | null): number | null {
