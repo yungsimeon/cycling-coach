@@ -55,8 +55,15 @@ export async function uploadRide(formData: FormData): Promise<void> {
     time_in_zones: rideMetrics.timeInZones,
     fit_file_path: path,
   });
-  if (insertError)
+  if (insertError) {
+    const { error: removeError } = await supabase.storage
+      .from("fit-files")
+      .remove([path]);
+    if (removeError)
+      console.error("Couldn't remove orphaned file", path, removeError);
+
     throw new Error("Couldn't save ride", { cause: insertError });
+  }
 }
 
 function roundOrNull(value: number | null): number | null {
