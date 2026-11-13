@@ -21,10 +21,7 @@ export default function RidePage() {
     <main className={page}>
       <div className="mb-6 flex items-center justify-between">
         <h1 className={pageTitle}>Rides</h1>
-        <Link
-          href="/rides/upload"
-          className={buttonPrimary}
-        >
+        <Link href="/rides/upload" className={buttonPrimary}>
           Upload ride
         </Link>
       </div>
@@ -63,10 +60,7 @@ async function RideList() {
         <p className="mt-1 text-sm text-muted">
           Upload a .FIT file from your bike computer to get started.
         </p>
-        <Link
-          href="/rides/upload"
-          className={`${buttonPrimary} mt-5`}
-        >
+        <Link href="/rides/upload" className={`${buttonPrimary} mt-5`}>
           Upload a ride
         </Link>
       </div>
@@ -82,54 +76,59 @@ async function RideList() {
           return (
             <li
               key={ride.id}
-              className="flex items-center gap-4 rounded-row border-b border-line-subtle px-3 py-3 last:border-b-0 hover:bg-surface-hover"
+              className="border-b border-line-subtle last:border-b-0"
             >
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">
-                  {formatDate(ride.started_at)}
-                </p>
-                <p className="mt-0.5 flex flex-wrap gap-x-1.5 text-xs tabular-nums text-muted">
-                  <span className="whitespace-nowrap">
-                    {formatDistance(ride.distance_m)}
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span className="whitespace-nowrap">
-                    {formatDuration(ride.moving_time_s)}
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span className="whitespace-nowrap">
-                    {formatSpeed(
-                      averageSpeedKmh(ride.distance_m, ride.moving_time_s),
-                    )}
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span className="whitespace-nowrap">
-                    {formatElevation(ride.elevation_gain_m)}
-                  </span>
-                </p>
-              </div>
-              <div className="w-24 shrink-0">
-                {ride.tss !== null ? (
-                  <>
-                    <p className="text-right text-sm font-bold tabular-nums">
-                      {formatTss(ride.tss)}{" "}
-                      <span className="text-2xs font-medium text-muted">
-                        TSS
-                      </span>
-                    </p>
-                    <div className="mt-1.5 h-1 rounded-full bg-line">
-                      <div
-                        className="h-1 rounded-full bg-accent"
-                        style={{
-                          width: `${Math.min(100, (ride.tss / TSS_BAR_MAX) * 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-right text-xs text-muted">no power</p>
-                )}
-              </div>
+              <Link
+                href={`/rides/${ride.id}`}
+                className="flex items-center gap-4 rounded-row px-3 py-3 hover:bg-surface-hover"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold">
+                    {formatDate(ride.started_at)}
+                  </p>
+                  <p className="mt-0.5 flex flex-wrap gap-x-1.5 text-xs tabular-nums text-muted">
+                    <span className="whitespace-nowrap">
+                      {formatDistance(ride.distance_m)}
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span className="whitespace-nowrap">
+                      {formatDuration(ride.moving_time_s)}
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span className="whitespace-nowrap">
+                      {formatSpeed(
+                        averageSpeedKmh(ride.distance_m, ride.moving_time_s),
+                      )}
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span className="whitespace-nowrap">
+                      {formatElevation(ride.elevation_gain_m)}
+                    </span>
+                  </p>
+                </div>
+                <div className="w-24 shrink-0">
+                  {ride.tss !== null ? (
+                    <>
+                      <p className="text-right text-sm font-bold tabular-nums">
+                        {formatTss(ride.tss)}{" "}
+                        <span className="text-2xs font-medium text-muted">
+                          TSS
+                        </span>
+                      </p>
+                      <div className="mt-1.5 h-1 rounded-full bg-line">
+                        <div
+                          className="h-1 rounded-full bg-accent"
+                          style={{
+                            width: `${Math.min(100, (ride.tss / TSS_BAR_MAX) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-right text-xs text-muted">no power</p>
+                  )}
+                </div>
+              </Link>
             </li>
           );
         })}
