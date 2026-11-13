@@ -38,16 +38,19 @@ export type Database = {
         Row: {
           ftp: number | null
           id: string
+          lthr: number | null
           max_hr: number | null
         }
         Insert: {
           ftp?: number | null
           id: string
+          lthr?: number | null
           max_hr?: number | null
         }
         Update: {
           ftp?: number | null
           id?: string
+          lthr?: number | null
           max_hr?: number | null
         }
         Relationships: []
