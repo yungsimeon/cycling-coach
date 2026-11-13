@@ -4,6 +4,7 @@ import { parseFit } from "@/lib/fit/parse";
 import type { Ride } from "@/lib/fit/types";
 import { calculateRideMetrics } from "@/lib/metrics/ride-metrics";
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export type UploadRideState = { error: string } | undefined;
@@ -80,7 +81,8 @@ export async function uploadRide(
     }
     return { error: "Couldn't save your ride. Please try again." };
   }
-  return undefined;
+  revalidatePath("/rides");
+  redirect("/rides");
 }
 
 function roundOrNull(value: number | null): number | null {
