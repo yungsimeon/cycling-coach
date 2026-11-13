@@ -1,3 +1,12 @@
+import {
+  formatDate,
+  formatDistance,
+  formatDuration,
+  formatElevation,
+  formatSpeed,
+  formatTss,
+} from "@/lib/format/units";
+import { averageSpeedKmh } from "@/lib/metrics/speed";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -38,11 +47,16 @@ async function RideList() {
       {rides.map((ride) => {
         return (
           <div key={ride.id}>
-            <p>{ride.started_at}</p>
-            <p>{ride.distance_m}</p>
-            <p>{ride.moving_time_s}</p>
-            <p>{ride.elevation_gain_m}</p>
-            <p>{ride.tss}</p>
+            <p>{formatDate(ride.started_at)}</p>
+            <p>{formatDistance(ride.distance_m)}</p>
+            <p>{formatDuration(ride.moving_time_s)}</p>
+            <p>
+              {formatSpeed(
+                averageSpeedKmh(ride.distance_m, ride.moving_time_s),
+              )}
+            </p>
+            <p>{formatElevation(ride.elevation_gain_m)}</p>
+            {ride.tss !== null && <p>TSS {formatTss(ride.tss)}</p>}
           </div>
         );
       })}
