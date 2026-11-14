@@ -1,6 +1,7 @@
 import type { RideSample } from "../fit/types";
 
 const NP_WINDOW_S = 30; // rolling window for NP. 30s is roughly how long the body takes to respond to a change in effort
+const MAX_VALID_POWER = 2500; // matches our DB check on rides.peak_power
 
 export function averagePower(samples: RideSample[]): number | null {
   const powers = powerValues(samples);
@@ -43,10 +44,16 @@ export function trainingStressScore(
   return (durationS / 3600) * intensityFactor(np, ftp) ** 2 * 100;
 }
 
+export function peakPower(samples: RideSample[]): number | null {
+  const powers = powerValues(samples);
+  if (powers.length === 0) return null;
+  return powers.reduce((acc, currVal) => Math.max(acc, currVal));
+}
+
 function powerValues(samples: RideSample[]): number[] {
   const powers: number[] = [];
   for (const sample of samples) {
-    if (sample.power === null) continue;
+    if (sample.power === null || sample.power > MAX_VALID_POWER) continue;
     powers.push(sample.power);
   }
   return powers;

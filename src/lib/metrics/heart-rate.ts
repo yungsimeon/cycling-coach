@@ -20,6 +20,21 @@ export function thresholdHr(
 }
 
 export function averageHr(samples: RideSample[]): number | null {
+  const heartRates = heartRateValues(samples);
+  if (heartRates.length === 0) return null;
+
+  return Math.round(
+    heartRates.reduce((acc, currVal) => acc + currVal, 0) / heartRates.length,
+  );
+}
+
+export function peakHr(samples: RideSample[]): number | null {
+  const heartRates = heartRateValues(samples);
+  if (heartRates.length === 0) return null;
+  return heartRates.reduce((acc, currVal) => Math.max(acc, currVal));
+}
+
+function heartRateValues(samples: RideSample[]): number[] {
   const heartRates: number[] = [];
   for (const sample of samples) {
     if (
@@ -30,9 +45,5 @@ export function averageHr(samples: RideSample[]): number | null {
       continue;
     heartRates.push(sample.heartRate);
   }
-  if (heartRates.length === 0) return null;
-
-  return Math.round(
-    heartRates.reduce((acc, currVal) => acc + currVal, 0) / heartRates.length,
-  );
+  return heartRates;
 }

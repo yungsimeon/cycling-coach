@@ -71,6 +71,8 @@ export type Database = {
           lthr_estimated: boolean | null
           moving_time_s: number
           normalized_power: number | null
+          peak_hr: number | null
+          peak_power: number | null
           sport: string
           started_at: string
           time_in_hr_zones: Json | null
@@ -94,6 +96,8 @@ export type Database = {
           lthr_estimated?: boolean | null
           moving_time_s: number
           normalized_power?: number | null
+          peak_hr?: number | null
+          peak_power?: number | null
           sport: string
           started_at: string
           time_in_hr_zones?: Json | null
@@ -117,6 +121,8 @@ export type Database = {
           lthr_estimated?: boolean | null
           moving_time_s?: number
           normalized_power?: number | null
+          peak_hr?: number | null
+          peak_power?: number | null
           sport?: string
           started_at?: string
           time_in_hr_zones?: Json | null
