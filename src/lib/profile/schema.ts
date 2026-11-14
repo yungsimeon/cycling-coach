@@ -9,5 +9,10 @@ export const profileSchema = z.object({
   max_hr: z.preprocess((val) => {
     if (val === "" || val == null) return null;
     return Number(val);
-  }, z.number("Please enter a number").int("whole numbers only").min(120, "Max heart rate must be at least 120").max(230, "Max heart rate can be 230 at most").nullable()),
+  }, z.number("Please enter a number").int("whole numbers only").min(130, "Max heart rate must be at least 130").max(230, "Max heart rate can be 230 at most").nullable()),
+
+  lthr: z.preprocess((val) => {
+    if (val === "" || val == null) return null;
+    return Number(val);
+  }, z.number("Please enter a number").int("whole numbers only").min(120, "Threshold heart rate must be at least 120").max(210, "Threshold heart rate can be 210 at most").nullable()),
 });

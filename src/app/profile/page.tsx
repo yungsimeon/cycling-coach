@@ -10,9 +10,7 @@ export default function ProfilePage() {
       <h1 className={`${pageTitle} mb-6`}>Profile</h1>
       <Suspense
         fallback={
-          <div className={`${card} text-sm text-muted`}>
-            Loading profile...
-          </div>
+          <div className={`${card} text-sm text-muted`}>Loading profile...</div>
         }
       >
         <ProfileDetails />
@@ -27,17 +25,26 @@ async function ProfileDetails() {
   const { data, error } = await supabase.from("profiles").select("*").single();
   if (error) console.error(error);
   if (!data)
-    return <div className={`${card} ${errorText}`}>Couldn&apos;t load profile</div>;
+    return (
+      <div className={`${card} ${errorText}`}>Couldn&apos;t load profile</div>
+    );
   return (
     <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-2 gap-3">
-        <Stat label="FTP" value={data.ftp !== null ? `${data.ftp} W` : "Not set"} />
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Stat
+          label="FTP"
+          value={data.ftp !== null ? `${data.ftp} W` : "Not set"}
+        />
         <Stat
           label="Max Heart Rate"
           value={data.max_hr !== null ? `${data.max_hr} bpm` : "Not set"}
         />
+        <Stat
+          label="Threshold Heart Rate"
+          value={data.lthr !== null ? `${data.lthr} bpm` : "Not set"}
+        />
       </div>
-      <ProfileForm ftp={data.ftp} maxHr={data.max_hr} />
+      <ProfileForm ftp={data.ftp} maxHr={data.max_hr} lthr={data.lthr} />
     </div>
   );
 }

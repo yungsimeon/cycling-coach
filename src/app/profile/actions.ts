@@ -7,7 +7,7 @@ import z from "zod";
 
 export type ProfileFormState =
   | {
-      fieldErrors?: { ftp?: string[]; max_hr?: string[] };
+      fieldErrors?: { ftp?: string[]; max_hr?: string[]; lthr?: string[] };
       message?: string;
       success?: boolean;
     }
@@ -20,6 +20,7 @@ export async function updateProfile(
   const result = profileSchema.safeParse({
     ftp: formData.get("ftp"),
     max_hr: formData.get("max_hr"),
+    lthr: formData.get("lthr"),
   });
 
   if (!result.success) {

@@ -13,7 +13,13 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { card, errorText, label, page, pageTitle } from "@/components/ui/styles";
+import {
+  card,
+  errorText,
+  label,
+  page,
+  pageTitle,
+} from "@/components/ui/styles";
 
 export default function RideDetailPage({ params }: PageProps<"/rides/[id]">) {
   return (
@@ -23,7 +29,9 @@ export default function RideDetailPage({ params }: PageProps<"/rides/[id]">) {
       </Link>
       <Suspense
         fallback={
-          <div className={`${card} mt-6 text-sm text-muted`}>Loading ride...</div>
+          <div className={`${card} mt-6 text-sm text-muted`}>
+            Loading ride...
+          </div>
         }
       >
         <RideDetails params={params} />
@@ -43,7 +51,11 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
     .maybeSingle();
   if (error) {
     console.error(error);
-    return <div className={`${card} mt-6 ${errorText}`}>Couldn&apos;t load ride.</div>;
+    return (
+      <div className={`${card} mt-6 ${errorText}`}>
+        Couldn&apos;t load ride.
+      </div>
+    );
   }
   if (ride === null) notFound();
   const zones = ride.time_in_zones as ZoneTime[] | null;
@@ -61,22 +73,36 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
         <Stat label="Elapsed time" value={formatDuration(ride.total_time_s)} />
         <Stat
           label="Avg speed"
-          value={formatSpeed(averageSpeedKmh(ride.distance_m, ride.moving_time_s))}
+          value={formatSpeed(
+            averageSpeedKmh(ride.distance_m, ride.moving_time_s),
+          )}
         />
-        <Stat label="Elevation" value={formatElevation(ride.elevation_gain_m)} />
+        <Stat
+          label="Elevation"
+          value={formatElevation(ride.elevation_gain_m)}
+        />
       </Section>
 
       {ride.avg_power !== null && (
         <Section title="Power">
           <Stat label="Avg power" value={`${ride.avg_power} W`} />
           {ride.normalized_power !== null && (
-            <Stat label="Normalized power" value={`${ride.normalized_power} W`} />
+            <Stat
+              label="Normalized power"
+              value={`${ride.normalized_power} W`}
+            />
           )}
           {ride.intensity_factor !== null && (
-            <Stat label="Intensity factor" value={ride.intensity_factor.toFixed(2)} />
+            <Stat
+              label="Intensity factor"
+              value={ride.intensity_factor.toFixed(2)}
+            />
           )}
           {ride.tss !== null && (
-            <Stat label="Training stress" value={`${formatTss(ride.tss)} TSS`} />
+            <Stat
+              label="Training stress"
+              value={`${formatTss(ride.tss)} TSS`}
+            />
           )}
         </Section>
       )}
@@ -120,7 +146,13 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section>
       <h2 className={`${label} mb-2`}>{title}</h2>
@@ -146,7 +178,10 @@ function ZoneBar({ timeS, zones }: { timeS: number; zones: ZoneTime[] }) {
   const width = longest > 0 ? (timeS / longest) * 100 : 0;
   return (
     <div className="mt-1.5 h-1.5 rounded-full bg-line">
-      <div className="h-1.5 rounded-full bg-accent" style={{ width: `${width}%` }} />
+      <div
+        className="h-1.5 rounded-full bg-accent"
+        style={{ width: `${width}%` }}
+      />
     </div>
   );
 }
