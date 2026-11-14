@@ -57,54 +57,69 @@ export type Database = {
       }
       rides: {
         Row: {
+          avg_hr: number | null
           avg_power: number | null
           created_at: string
           distance_m: number | null
           elevation_gain_m: number | null
           fit_file_path: string
           ftp: number | null
+          hr_tss: number | null
           id: string
           intensity_factor: number | null
+          lthr: number | null
+          lthr_estimated: boolean | null
           moving_time_s: number
           normalized_power: number | null
           sport: string
           started_at: string
+          time_in_hr_zones: Json | null
           time_in_zones: Json | null
           total_time_s: number
           tss: number | null
           user_id: string
         }
         Insert: {
+          avg_hr?: number | null
           avg_power?: number | null
           created_at?: string
           distance_m?: number | null
           elevation_gain_m?: number | null
           fit_file_path: string
           ftp?: number | null
+          hr_tss?: number | null
           id?: string
           intensity_factor?: number | null
+          lthr?: number | null
+          lthr_estimated?: boolean | null
           moving_time_s: number
           normalized_power?: number | null
           sport: string
           started_at: string
+          time_in_hr_zones?: Json | null
           time_in_zones?: Json | null
           total_time_s: number
           tss?: number | null
           user_id: string
         }
         Update: {
+          avg_hr?: number | null
           avg_power?: number | null
           created_at?: string
           distance_m?: number | null
           elevation_gain_m?: number | null
           fit_file_path?: string
           ftp?: number | null
+          hr_tss?: number | null
           id?: string
           intensity_factor?: number | null
+          lthr?: number | null
+          lthr_estimated?: boolean | null
           moving_time_s?: number
           normalized_power?: number | null
           sport?: string
           started_at?: string
+          time_in_hr_zones?: Json | null
           time_in_zones?: Json | null
           total_time_s?: number
           tss?: number | null
