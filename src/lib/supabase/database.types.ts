@@ -57,6 +57,7 @@ export type Database = {
       }
       rides: {
         Row: {
+          avg_cadence: number | null
           avg_hr: number | null
           avg_power: number | null
           created_at: string
@@ -73,6 +74,7 @@ export type Database = {
           normalized_power: number | null
           peak_hr: number | null
           peak_power: number | null
+          peak_speed_mps: number | null
           sport: string
           started_at: string
           time_in_hr_zones: Json | null
@@ -82,6 +84,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avg_cadence?: number | null
           avg_hr?: number | null
           avg_power?: number | null
           created_at?: string
@@ -98,6 +101,7 @@ export type Database = {
           normalized_power?: number | null
           peak_hr?: number | null
           peak_power?: number | null
+          peak_speed_mps?: number | null
           sport: string
           started_at: string
           time_in_hr_zones?: Json | null
@@ -107,6 +111,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avg_cadence?: number | null
           avg_hr?: number | null
           avg_power?: number | null
           created_at?: string
@@ -123,6 +128,7 @@ export type Database = {
           normalized_power?: number | null
           peak_hr?: number | null
           peak_power?: number | null
+          peak_speed_mps?: number | null
           sport?: string
           started_at?: string
           time_in_hr_zones?: Json | null
