@@ -10,7 +10,7 @@ export function averageSpeedKmh(
   return (distanceM / movingTimeS) * 3.6;
 }
 
-export function peakSpeedMps(samples: RideSample[]): number | null {
+export function getPeakSpeedMps(samples: RideSample[]): number | null {
   const speeds: number[] = [];
   for (const sample of samples) {
     if (sample.speedMps === null || sample.speedMps > MAX_VALID_SPEED_MPS)

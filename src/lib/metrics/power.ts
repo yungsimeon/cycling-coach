@@ -44,7 +44,7 @@ export function trainingStressScore(
   return (durationS / 3600) * intensityFactor(np, ftp) ** 2 * 100;
 }
 
-export function peakPower(samples: RideSample[]): number | null {
+export function getPeakPower(samples: RideSample[]): number | null {
   const powers = powerValues(samples);
   if (powers.length === 0) return null;
   return powers.reduce((acc, currVal) => Math.max(acc, currVal));

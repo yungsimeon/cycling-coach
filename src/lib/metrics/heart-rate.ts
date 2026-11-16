@@ -28,7 +28,7 @@ export function averageHr(samples: RideSample[]): number | null {
   );
 }
 
-export function peakHr(samples: RideSample[]): number | null {
+export function getPeakHr(samples: RideSample[]): number | null {
   const heartRates = heartRateValues(samples);
   if (heartRates.length === 0) return null;
   return heartRates.reduce((acc, currVal) => Math.max(acc, currVal));
