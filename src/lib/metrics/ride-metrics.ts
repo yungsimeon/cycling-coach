@@ -1,6 +1,7 @@
-import { timeInPowerZones, type ZoneTime } from "./zones.ts";
+import { timePerZone, type ZoneTime, POWER_ZONES } from "./zones.ts";
 import type { Ride } from "../fit/types";
 import {
+  powerValues,
   averagePower,
   getPeakPower,
   intensityFactor,
@@ -24,13 +25,15 @@ export type RideMetrics = {
   avgCadence: number | null;
   tss: number | null;
   intensityFactor: number | null;
-  timeInZones: ZoneTime[] | null;
+  timeInPowerZones: ZoneTime[] | null;
 };
 
 export function calculateRideMetrics(
   ride: Ride,
   ftp: number | null,
 ): RideMetrics {
+  const powers = powerValues(ride.samples);
+
   const avgPower = averagePower(ride.samples);
   const powerNormalized = normalizedPower(ride.samples);
   const avgHr = averageHr(ride.samples);
@@ -50,9 +53,9 @@ export function calculateRideMetrics(
     powerNormalized !== null && ftp !== null
       ? trainingStressScore(ride.movingTimeS, powerNormalized, ftp)
       : null;
-  const timeInZones =
-    ftp !== null && avgPower !== null
-      ? timeInPowerZones(ride.samples, ftp)
+  const timeInPowerZones =
+    ftp !== null && powers.length > 0
+      ? timePerZone(powers, ftp, POWER_ZONES)
       : null;
 
   return {
@@ -65,6 +68,6 @@ export function calculateRideMetrics(
     avgCadence,
     tss,
     intensityFactor: ifValue,
-    timeInZones,
+    timeInPowerZones,
   };
 }

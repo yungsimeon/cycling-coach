@@ -73,7 +73,7 @@ export async function uploadRide(
     avg_cadence: rideMetrics.avgCadence,
     intensity_factor: rideMetrics.intensityFactor,
     tss: rideMetrics.tss,
-    time_in_zones: rideMetrics.timeInZones,
+    time_in_zones: rideMetrics.timeInPowerZones,
     fit_file_path: path,
   });
   if (insertError) {

@@ -1,9 +1,7 @@
-import type { RideSample } from "../fit/types";
-
-export type PowerZone = {
+export type Zone = {
   zone: number;
   name: string;
-  maxPctFtp: number;
+  maxPct: number;
 };
 
 export type ZoneTime = {
@@ -11,40 +9,48 @@ export type ZoneTime = {
   timeS: number;
 };
 
-export const POWER_ZONES: PowerZone[] = [
-  { zone: 1, name: "Active Recovery", maxPctFtp: 55 },
-  { zone: 2, name: "Endurance", maxPctFtp: 75 },
-  { zone: 3, name: "Tempo", maxPctFtp: 90 },
-  { zone: 4, name: "Threshold", maxPctFtp: 105 },
-  { zone: 5, name: "VO2max", maxPctFtp: 120 },
-  { zone: 6, name: "Anaerobic", maxPctFtp: 150 },
-  { zone: 7, name: "Neuromuscular", maxPctFtp: Infinity },
+export const POWER_ZONES: Zone[] = [
+  { zone: 1, name: "Active Recovery", maxPct: 55 },
+  { zone: 2, name: "Endurance", maxPct: 75 },
+  { zone: 3, name: "Tempo", maxPct: 90 },
+  { zone: 4, name: "Threshold", maxPct: 105 },
+  { zone: 5, name: "VO2max", maxPct: 120 },
+  { zone: 6, name: "Anaerobic", maxPct: 150 },
+  { zone: 7, name: "Neuromuscular", maxPct: Infinity },
 ];
 
-export function powerZoneFor(watts: number, ftp: number): PowerZone {
-  const percentage = (watts / ftp) * 100;
-  for (const zone of POWER_ZONES) {
-    if (zone.maxPctFtp >= percentage) return zone;
+export const HR_ZONES: Zone[] = [
+  { zone: 1, name: "Active Recovery", maxPct: 68 },
+  { zone: 2, name: "Endurance", maxPct: 83 },
+  { zone: 3, name: "Tempo", maxPct: 94 },
+  { zone: 4, name: "Threshold", maxPct: 105 },
+  { zone: 5, name: "VO2max", maxPct: Infinity },
+];
+
+export function zoneFor(value: number, threshold: number, zones: Zone[]): Zone {
+  const percentage = (value / threshold) * 100;
+  for (const zone of zones) {
+    if (zone.maxPct >= percentage) return zone;
   }
-  throw new Error(`No power zone found for ${watts}W at FTP ${ftp}`);
+  throw new Error(`No zone found for ${value} at ${threshold}`);
 }
 
-export function timeInPowerZones(
-  samples: RideSample[],
-  ftp: number,
+export function timePerZone(
+  values: number[],
+  threshold: number,
+  zones: Zone[],
 ): ZoneTime[] {
-  const zoneTimes: ZoneTime[] = POWER_ZONES.map((powerZone) => {
-    return { zone: powerZone.zone, timeS: 0 };
+  const zoneTimes: ZoneTime[] = zones.map((zone) => {
+    return { zone: zone.zone, timeS: 0 };
   });
 
-  for (const sample of samples) {
-    if (sample.power === null) continue;
-    const powerZone = powerZoneFor(sample.power, ftp);
+  for (const value of values) {
+    const currentZone = zoneFor(value, threshold, zones);
     const matchingZone = zoneTimes.find(
-      (element) => element.zone === powerZone.zone,
+      (element) => element.zone === currentZone.zone,
     );
     if (!matchingZone) continue;
-    matchingZone.timeS = matchingZone.timeS + 1;
+    matchingZone.timeS += 1;
   }
   return zoneTimes;
 }

@@ -50,7 +50,7 @@ export function getPeakPower(samples: RideSample[]): number | null {
   return powers.reduce((acc, currVal) => Math.max(acc, currVal));
 }
 
-function powerValues(samples: RideSample[]): number[] {
+export function powerValues(samples: RideSample[]): number[] {
   const powers: number[] = [];
   for (const sample of samples) {
     if (sample.power === null || sample.power > MAX_VALID_POWER) continue;
