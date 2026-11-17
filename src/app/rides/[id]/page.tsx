@@ -6,7 +6,7 @@ import {
   formatSpeed,
   formatTss,
 } from "@/lib/format/units";
-import { averageSpeedKmh } from "@/lib/metrics/speed";
+import { averageSpeedKmh, mpsToKmh } from "@/lib/metrics/speed";
 import { POWER_ZONES, type ZoneTime } from "@/lib/metrics/zones";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
@@ -77,6 +77,12 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
             averageSpeedKmh(ride.distance_m, ride.moving_time_s),
           )}
         />
+        {ride.peak_speed_mps !== null && (
+          <Stat
+            label="Max speed"
+            value={formatSpeed(mpsToKmh(ride.peak_speed_mps))}
+          />
+        )}
         <Stat
           label="Elevation"
           value={formatElevation(ride.elevation_gain_m)}
@@ -92,6 +98,9 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
               value={`${ride.normalized_power} W`}
             />
           )}
+          {ride.peak_power !== null && (
+            <Stat label="Max power" value={`${ride.peak_power} W`} />
+          )}
           {ride.intensity_factor !== null && (
             <Stat
               label="Intensity factor"
@@ -103,6 +112,20 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
               label="Training stress"
               value={`${formatTss(ride.tss)} TSS`}
             />
+          )}
+        </Section>
+      )}
+
+      {(ride.avg_hr !== null || ride.avg_cadence !== null) && (
+        <Section title="Heart rate & cadence">
+          {ride.avg_hr !== null && (
+            <Stat label="Avg heart rate" value={`${ride.avg_hr} bpm`} />
+          )}
+          {ride.peak_hr !== null && (
+            <Stat label="Max heart rate" value={`${ride.peak_hr} bpm`} />
+          )}
+          {ride.avg_cadence !== null && (
+            <Stat label="Avg cadence" value={`${ride.avg_cadence} rpm`} />
           )}
         </Section>
       )}
