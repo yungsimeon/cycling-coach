@@ -1,4 +1,4 @@
-import { timePerZone, type ZoneTime, POWER_ZONES } from "./zones.ts";
+import { timePerZone, type ZoneTime, POWER_ZONES, HR_ZONES } from "./zones.ts";
 import type { Ride } from "../fit/types";
 import {
   powerValues,
@@ -8,7 +8,7 @@ import {
   normalizedPower,
   trainingStressScore,
 } from "./power.ts";
-import { averageHr, getPeakHr } from "./heart-rate.ts";
+import { averageHr, getPeakHr, heartRateValues } from "./heart-rate.ts";
 import { getPeakSpeedMps } from "./speed.ts";
 import { averageCadence } from "./cadence.ts";
 
@@ -26,13 +26,16 @@ export type RideMetrics = {
   tss: number | null;
   intensityFactor: number | null;
   timeInPowerZones: ZoneTime[] | null;
+  timeInHrZones: ZoneTime[] | null;
 };
 
 export function calculateRideMetrics(
   ride: Ride,
   ftp: number | null,
+  lthr: number | null,
 ): RideMetrics {
   const powers = powerValues(ride.samples);
+  const heartRates = heartRateValues(ride.samples);
 
   const avgPower = averagePower(ride.samples);
   const powerNormalized = normalizedPower(ride.samples);
@@ -58,6 +61,11 @@ export function calculateRideMetrics(
       ? timePerZone(powers, ftp, POWER_ZONES)
       : null;
 
+  const timeInHrZones =
+    lthr !== null && heartRates.length > 0
+      ? timePerZone(heartRates, lthr, HR_ZONES)
+      : null;
+
   return {
     avgPower,
     normalizedPower: powerNormalized,
@@ -69,5 +77,6 @@ export function calculateRideMetrics(
     tss,
     intensityFactor: ifValue,
     timeInPowerZones,
+    timeInHrZones: hrTrustworthy ? timeInHrZones : null,
   };
 }

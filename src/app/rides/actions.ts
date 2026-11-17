@@ -2,6 +2,7 @@
 
 import { parseFit } from "@/lib/fit/parse";
 import type { Ride } from "@/lib/fit/types";
+import { thresholdHr } from "@/lib/metrics/heart-rate";
 import { calculateRideMetrics } from "@/lib/metrics/ride-metrics";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -23,7 +24,7 @@ export async function uploadRide(
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("ftp")
+    .select("ftp, lthr, max_hr")
     .eq("id", user.id)
     .single();
   if (profileError) {
@@ -31,6 +32,10 @@ export async function uploadRide(
     return { error: "Something went wrong, please try again." };
   }
   const ftp = profile.ftp;
+  const lthr = profile.lthr;
+  const maxHr = profile.max_hr;
+
+  const threshold = thresholdHr(lthr, maxHr);
 
   const file = formData.get("file");
   if (!(file instanceof File)) throw new Error("Input is not a file.");
@@ -44,7 +49,7 @@ export async function uploadRide(
     return { error: "This doesn't look like a valid FIT file." };
   }
 
-  const rideMetrics = calculateRideMetrics(ride, ftp);
+  const rideMetrics = calculateRideMetrics(ride, ftp, threshold?.bpm ?? null);
 
   const path = `${user.id}/${crypto.randomUUID()}.fit`;
   const { error: uploadError } = await supabase.storage
@@ -66,6 +71,8 @@ export async function uploadRide(
     avg_power: roundOrNull(rideMetrics.avgPower),
     normalized_power: roundOrNull(rideMetrics.normalizedPower),
     ftp: ftp,
+    lthr: threshold?.bpm ?? null,
+    lthr_estimated: threshold?.estimated ?? null,
     avg_hr: rideMetrics.avgHr,
     peak_hr: rideMetrics.peakHr,
     peak_power: rideMetrics.peakPower,
@@ -74,6 +81,7 @@ export async function uploadRide(
     intensity_factor: rideMetrics.intensityFactor,
     tss: rideMetrics.tss,
     time_in_zones: rideMetrics.timeInPowerZones,
+    time_in_hr_zones: rideMetrics.timeInHrZones,
     fit_file_path: path,
   });
   if (insertError) {
