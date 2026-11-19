@@ -80,6 +80,7 @@ export async function uploadRide(
     avg_cadence: rideMetrics.avgCadence,
     intensity_factor: rideMetrics.intensityFactor,
     tss: rideMetrics.tss,
+    hr_tss: rideMetrics.hrTss,
     time_in_zones: rideMetrics.timeInPowerZones,
     time_in_hr_zones: rideMetrics.timeInHrZones,
     fit_file_path: path,

@@ -34,6 +34,15 @@ export function getPeakHr(samples: RideSample[]): number | null {
   return heartRates.reduce((acc, currVal) => Math.max(acc, currVal));
 }
 
+export function heartRateTss(
+  heartRates: number[],
+  lthr: number,
+): number | null {
+  const values = heartRates.map((hr) => ((hr / lthr) ** 2 * 100) / 3600);
+  if (values.length === 0) return null;
+  return values.reduce((acc, currVal) => acc + currVal, 0);
+}
+
 export function heartRateValues(samples: RideSample[]): number[] {
   const heartRates: number[] = [];
   for (const sample of samples) {
