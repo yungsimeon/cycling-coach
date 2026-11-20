@@ -25,6 +25,7 @@
   --color-accent: #b5f05c; /* lime: buttons, highlights */
   --color-on-accent: #0b0c0f; /* text on accent backgrounds */
   --color-danger: #ff6b6b; /* error messages */
+  --color-heart: #ff8f6b; /* heart rate data (zone bars), warmer than danger */
 
   /* Radius (rem, so it scales with the user's font size; 1rem = 16px by default) */
   --radius-card: 1.25rem;

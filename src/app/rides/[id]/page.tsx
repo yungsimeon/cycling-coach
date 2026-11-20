@@ -7,7 +7,12 @@ import {
   formatTss,
 } from "@/lib/format/units";
 import { averageSpeedKmh, mpsToKmh } from "@/lib/metrics/speed";
-import { POWER_ZONES, type ZoneTime } from "@/lib/metrics/zones";
+import {
+  HR_ZONES,
+  POWER_ZONES,
+  type Zone,
+  type ZoneTime,
+} from "@/lib/metrics/zones";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -58,7 +63,8 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
     );
   }
   if (ride === null) notFound();
-  const zones = ride.time_in_zones as ZoneTime[] | null;
+  const powerZones = ride.time_in_zones as ZoneTime[] | null;
+  const hrZones = ride.time_in_hr_zones as ZoneTime[] | null;
 
   return (
     <div className="mt-2 flex flex-col gap-6">
@@ -124,47 +130,94 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
           {ride.peak_hr !== null && (
             <Stat label="Max heart rate" value={`${ride.peak_hr} bpm`} />
           )}
+          {ride.hr_tss !== null && (
+            <Stat
+              label="Training stress (HR)"
+              value={`${formatTss(ride.hr_tss)} hrTSS`}
+            />
+          )}
           {ride.avg_cadence !== null && (
             <Stat label="Avg cadence" value={`${ride.avg_cadence} rpm`} />
           )}
         </Section>
       )}
 
-      {zones && (
-        <div className={card}>
-          <div className="mb-4 flex items-baseline justify-between gap-4">
-            <p className={label}>Time in power zones</p>
-            {ride.ftp !== null && (
-              <p className="text-xs text-muted">at FTP {ride.ftp} W</p>
-            )}
-          </div>
-          <ul className="flex flex-col gap-3">
-            {zones.map((zone) => {
-              const matchingZone = POWER_ZONES.find(
-                (element) => element.zone === zone.zone,
-              );
-              return (
-                <li key={zone.zone} className="flex items-center gap-3">
-                  <span className="w-8 shrink-0 text-xs font-semibold tabular-nums text-muted">
-                    Z{zone.zone}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="truncate text-sm">
-                        {matchingZone && matchingZone.name}
-                      </span>
-                      <span className="shrink-0 text-xs tabular-nums text-muted">
-                        {formatDuration(zone.timeS)}
-                      </span>
-                    </div>
-                    <ZoneBar timeS={zone.timeS} zones={zones} />
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+      {powerZones && (
+        <ZoneCard
+          title="Time in power zones"
+          note={ride.ftp !== null ? `at FTP ${ride.ftp} W` : null}
+          zoneTimes={powerZones}
+          zoneTable={POWER_ZONES}
+          barClass="bg-accent"
+        />
       )}
+
+      {hrZones && (
+        <ZoneCard
+          title="Time in heart rate zones"
+          note={
+            ride.lthr !== null
+              ? `at LTHR ${ride.lthr} bpm${ride.lthr_estimated ? " (estimated)" : ""}`
+              : null
+          }
+          zoneTimes={hrZones}
+          zoneTable={HR_ZONES}
+          barClass="bg-heart"
+        />
+      )}
+    </div>
+  );
+}
+
+// One card for both power and HR zones: the zone table supplies the names.
+function ZoneCard({
+  title,
+  note,
+  zoneTimes,
+  zoneTable,
+  barClass,
+}: {
+  title: string;
+  note: string | null;
+  zoneTimes: ZoneTime[];
+  zoneTable: Zone[];
+  barClass: string;
+}) {
+  return (
+    <div className={card}>
+      <div className="mb-4 flex items-baseline justify-between gap-4">
+        <p className={label}>{title}</p>
+        {note && <p className="text-xs text-muted">{note}</p>}
+      </div>
+      <ul className="flex flex-col gap-3">
+        {zoneTimes.map((zoneTime) => {
+          const matchingZone = zoneTable.find(
+            (element) => element.zone === zoneTime.zone,
+          );
+          return (
+            <li key={zoneTime.zone} className="flex items-center gap-3">
+              <span className="w-8 shrink-0 text-xs font-semibold tabular-nums text-muted">
+                Z{zoneTime.zone}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-sm">
+                    {matchingZone && matchingZone.name}
+                  </span>
+                  <span className="shrink-0 text-xs tabular-nums text-muted">
+                    {formatDuration(zoneTime.timeS)}
+                  </span>
+                </div>
+                <ZoneBar
+                  timeS={zoneTime.timeS}
+                  zones={zoneTimes}
+                  barClass={barClass}
+                />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -196,13 +249,21 @@ function Stat({ label: statLabel, value }: { label: string; value: string }) {
 }
 
 // Visual only: bar width relative to the longest zone, so the biggest zone fills the row.
-function ZoneBar({ timeS, zones }: { timeS: number; zones: ZoneTime[] }) {
+function ZoneBar({
+  timeS,
+  zones,
+  barClass,
+}: {
+  timeS: number;
+  zones: ZoneTime[];
+  barClass: string;
+}) {
   const longest = Math.max(...zones.map((z) => z.timeS));
   const width = longest > 0 ? (timeS / longest) * 100 : 0;
   return (
     <div className="mt-1.5 h-1.5 rounded-full bg-line">
       <div
-        className="h-1.5 rounded-full bg-accent"
+        className={`h-1.5 rounded-full ${barClass}`}
         style={{ width: `${width}%` }}
       />
     </div>
