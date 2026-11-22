@@ -19,6 +19,7 @@ export type RideLap = {
 
 export type Ride = {
   start: Date;
+  utcOffsetMin: number | null;
   sport: string;
   movingTimeS: number;
   totalTimeS: number;

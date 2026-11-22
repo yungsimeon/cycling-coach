@@ -84,6 +84,7 @@ export async function uploadRide(
     time_in_zones: rideMetrics.timeInPowerZones,
     time_in_hr_zones: rideMetrics.timeInHrZones,
     fit_file_path: path,
+    utc_offset_min: ride.utcOffsetMin,
   });
   if (insertError) {
     console.error(insertError);

@@ -82,6 +82,7 @@ export type Database = {
           total_time_s: number
           tss: number | null
           user_id: string
+          utc_offset_min: number | null
         }
         Insert: {
           avg_cadence?: number | null
@@ -109,6 +110,7 @@ export type Database = {
           total_time_s: number
           tss?: number | null
           user_id: string
+          utc_offset_min?: number | null
         }
         Update: {
           avg_cadence?: number | null
@@ -136,6 +138,7 @@ export type Database = {
           total_time_s?: number
           tss?: number | null
           user_id?: string
+          utc_offset_min?: number | null
         }
         Relationships: [
           {

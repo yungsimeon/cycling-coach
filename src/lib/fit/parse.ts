@@ -1,5 +1,9 @@
 import type { Ride, RideSample, RideLap } from "./types";
 import { Stream, Decoder } from "@garmin/fitsdk";
+import type { ActivityMesg } from "@garmin/fitsdk";
+
+const FIT_EPOCH_OFFSET_S = 631065600; // Seconds between the Unix epoch (1 Jan 1970) and
+// the FIT epoch (31 Dec 1989)
 
 export function parseFit(bytes: Uint8Array): Ride {
   const stream = Stream.fromByteArray(Array.from(bytes));
@@ -63,6 +67,7 @@ export function parseFit(bytes: Uint8Array): Ride {
     elevationGainM: session.totalAscent ?? null,
     samples: samples,
     laps: laps,
+    utcOffsetMin: utcOffsetMinutes(messages.activityMesgs?.[0]),
   };
   return ride;
 }
@@ -70,4 +75,16 @@ export function parseFit(bytes: Uint8Array): Ride {
 function semicirclesToDegrees(semicircles: number | undefined): number | null {
   if (semicircles === undefined) return null;
   return semicircles * (180 / 2 ** 31);
+}
+
+function utcOffsetMinutes(activity: ActivityMesg | undefined): number | null {
+  if (
+    !(activity?.timestamp instanceof Date) ||
+    typeof activity?.localTimestamp !== "number"
+  )
+    return null;
+  const fitTimestamp = activity.localTimestamp; // gives seconds since 31 dec 1989, so we'll need to add our OFFSET to it.
+  const localTimestamp = fitTimestamp + FIT_EPOCH_OFFSET_S;
+  const utcTimestamp = activity.timestamp.getTime() / 1000;
+  return (localTimestamp - utcTimestamp) / 60;
 }
