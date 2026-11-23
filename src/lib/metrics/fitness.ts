@@ -78,7 +78,16 @@ export function calculateFitness(dailyLoads: DailyLoad[]): FitnessDay[] {
   return daysFitness;
 }
 
-function localDay(start: Date, utcOffsetMin: number | null): string {
+export function fitnessTimeline(
+  rides: RideTrainingLoad[],
+  endDay: string,
+): FitnessDay[] {
+  const dailyLoads = sumDailyLoad(rides);
+  const completeDailyLoads = fillMissingDays(dailyLoads, endDay);
+  return calculateFitness(completeDailyLoads);
+}
+
+export function localDay(start: Date, utcOffsetMin: number | null): string {
   const utcOffsetMs = (utcOffsetMin ?? 0) * MS_PER_MINUTE;
   return new Date(utcOffsetMs + start.getTime()).toISOString().slice(0, 10);
 }
