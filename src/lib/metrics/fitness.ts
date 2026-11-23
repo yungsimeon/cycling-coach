@@ -10,6 +10,16 @@ export type DailyLoad = {
   tss: number;
 };
 
+export type FitnessDay = {
+  date: string;
+  ctl: number; // fitness
+  atl: number; // fatigue
+  tsb: number; // form (CTL - ATL)
+};
+
+const DAYS_FOR_CTL = 42; //CTL represents long-term fitness, calculated as a 42-day exponentially weighted average of daily training load
+const DAYS_FOR_ATL = 7; // ATL represents short-term fatigue, calculated as a 7-day exponentially weighted average
+
 const MS_PER_MINUTE = 60 * 1000;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -50,6 +60,22 @@ export function fillMissingDays(
     currentDay = nextDay(currentDay);
   }
   return dailyLoads;
+}
+
+export function calculateFitness(dailyLoads: DailyLoad[]): FitnessDay[] {
+  const daysFitness: FitnessDay[] = [];
+  let ctl = 0;
+  let atl = 0;
+
+  for (const load of dailyLoads) {
+    const date = load.date;
+    const tsb = ctl - atl;
+
+    ctl = ctl + (load.tss - ctl) / DAYS_FOR_CTL;
+    atl = atl + (load.tss - atl) / DAYS_FOR_ATL;
+    daysFitness.push({ date, ctl, atl, tsb });
+  }
+  return daysFitness;
 }
 
 function localDay(start: Date, utcOffsetMin: number | null): string {
