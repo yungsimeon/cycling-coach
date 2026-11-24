@@ -27,6 +27,11 @@
   --color-danger: #ff6b6b; /* error messages */
   --color-heart: #ff8f6b; /* heart rate data (zone bars), warmer than danger */
 
+  /* Fitness chart series (validated for colorblind separation + contrast on surface) */
+  --color-fitness: #6fa901; /* CTL */
+  --color-fatigue: #7071dd; /* ATL */
+  --color-form: #c9ccd3; /* TSB, single series on its own chart */
+
   /* Radius (rem, so it scales with the user's font size; 1rem = 16px by default) */
   --radius-card: 1.25rem;
   --radius-row: 0.75rem;

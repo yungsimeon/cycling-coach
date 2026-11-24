@@ -37,3 +37,20 @@ export function formatTss(tss: number): string {
 export function formatDate(date: string): string {
   return new Date(date).toLocaleDateString(LOCALE, { timeZone: TIME_ZONE });
 }
+
+// "+16", "-2", "0" (for form/TSB, where the sign is the point)
+export function formatSigned(value: number): string {
+  const rounded = Math.round(value);
+  return rounded > 0 ? `+${rounded}` : rounded.toString();
+}
+
+// For local day strings ("YYYY-MM-DD"). They parse as UTC midnight, so format in UTC
+// to keep the same day. short: "4.10.", long: "4.10.2026"
+export function formatDay(day: string, style: "short" | "long" = "long"): string {
+  return new Date(day).toLocaleDateString(LOCALE, {
+    day: "numeric",
+    month: "numeric",
+    year: style === "long" ? "numeric" : undefined,
+    timeZone: "UTC",
+  });
+}
