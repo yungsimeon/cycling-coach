@@ -8,12 +8,13 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export type UploadRideState = { error: string } | undefined;
+export type UploadRideResult =
+  | { ok: true; startedAt: string }
+  | { ok: false; error: string };
 
 export async function uploadRide(
-  prevState: UploadRideState,
   formData: FormData,
-): Promise<UploadRideState> {
+): Promise<UploadRideResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -29,7 +30,7 @@ export async function uploadRide(
     .single();
   if (profileError) {
     console.error(profileError);
-    return { error: "Something went wrong, please try again." };
+    return { ok: false, error: "Something went wrong, please try again." };
   }
   const ftp = profile.ftp;
   const lthr = profile.lthr;
@@ -38,15 +39,16 @@ export async function uploadRide(
   const threshold = thresholdHr(lthr, maxHr);
 
   const file = formData.get("file");
-  if (!(file instanceof File)) throw new Error("Input is not a file.");
-  if (file.size === 0) return { error: "Please choose a FIT file." };
+  if (!(file instanceof File))
+    return { ok: false, error: "Input is not a file." };
+  if (file.size === 0) return { ok: false, error: "Please choose a FIT file." };
   const fileContent = new Uint8Array(await file.arrayBuffer());
   let ride: Ride;
   try {
     ride = parseFit(fileContent);
   } catch (error) {
     console.error(error);
-    return { error: "This doesn't look like a valid FIT file." };
+    return { ok: false, error: "This doesn't look like a valid FIT file." };
   }
 
   const rideMetrics = calculateRideMetrics(ride, ftp, threshold?.bpm ?? null);
@@ -57,7 +59,7 @@ export async function uploadRide(
     .upload(path, file);
   if (uploadError) {
     console.error(uploadError);
-    return { error: "Couldn't upload your file. Please try again." };
+    return { ok: false, error: "Couldn't upload your file. Please try again." };
   }
 
   const { error: insertError } = await supabase.from("rides").insert({
@@ -94,10 +96,13 @@ export async function uploadRide(
     if (removeError) {
       console.error("Couldn't remove orphaned file", path, removeError);
     }
-    return { error: "Couldn't save your ride. Please try again." };
+    return { ok: false, error: "Couldn't save your ride. Please try again." };
   }
   revalidatePath("/rides");
-  redirect("/rides");
+  return {
+    ok: true,
+    startedAt: ride.start.toISOString(),
+  };
 }
 
 function roundOrNull(value: number | null): number | null {

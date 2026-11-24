@@ -9,7 +9,7 @@ export default function UploadRidePage() {
         ← Rides
       </Link>
       <h1 className={`${pageTitle} mt-2 mb-6`}>
-        Upload ride
+        Upload rides
       </h1>
       <UploadRideForm />
     </main>
