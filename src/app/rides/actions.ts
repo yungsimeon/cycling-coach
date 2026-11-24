@@ -12,6 +12,8 @@ export type UploadRideResult =
   | { ok: true; startedAt: string }
   | { ok: false; error: string };
 
+const UNIQUE_VIOLATION = "23505"; // Postgres error code: unique constraint violated
+
 export async function uploadRide(
   formData: FormData,
 ): Promise<UploadRideResult> {
@@ -96,6 +98,8 @@ export async function uploadRide(
     if (removeError) {
       console.error("Couldn't remove orphaned file", path, removeError);
     }
+    if (insertError.code === UNIQUE_VIOLATION)
+      return { ok: false, error: "This ride already exists." };
     return { ok: false, error: "Couldn't save your ride. Please try again." };
   }
   revalidatePath("/rides");
