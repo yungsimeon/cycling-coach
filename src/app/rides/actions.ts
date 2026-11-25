@@ -4,13 +4,24 @@ import { parseFit } from "@/lib/fit/parse";
 import type { Ride } from "@/lib/fit/types";
 import { thresholdHr } from "@/lib/metrics/heart-rate";
 import { calculateRideMetrics } from "@/lib/metrics/ride-metrics";
+import { updateRideSchema } from "@/lib/rides/schema";
 import { createClient } from "@/lib/supabase/server";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 export type UploadRideResult =
   | { ok: true; startedAt: string }
   | { ok: false; error: string };
+
+export type UpdateRideResult =
+  | { ok: true }
+  | {
+      ok: false;
+      fieldErrors?: { name?: string[]; description?: string[] };
+      message?: string;
+    }
+  | undefined;
 
 const UNIQUE_VIOLATION = "23505"; // Postgres error code: unique constraint violated
 
@@ -107,6 +118,48 @@ export async function uploadRide(
     ok: true,
     startedAt: ride.start.toISOString(),
   };
+}
+
+export async function updateRide(
+  prevState: UpdateRideResult,
+  formData: FormData,
+): Promise<UpdateRideResult> {
+  const result = updateRideSchema.safeParse({
+    id: formData.get("id"),
+    name: formData.get("name"),
+    description: formData.get("description"),
+  });
+  if (!result.success) {
+    const fieldErrors = z.flattenError(result.error).fieldErrors;
+    if (fieldErrors.id) return { message: "Ride not found", ok: false };
+    return { fieldErrors: fieldErrors, ok: false };
+  }
+  const { id, name, description } = result.data;
+  const supabase = await createClient();
+
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return { message: "Please log in again", ok: false };
+
+  const { data, error } = await supabase
+    .from("rides")
+    .update({ name, description })
+    .eq("id", id)
+    .select("id");
+
+  if (error) {
+    console.error(error);
+    return {
+      message: "Couldn't update ride. Please try again.",
+      ok: false,
+    };
+  }
+  if (data?.length === 0)
+    return {
+      message: "Ride not found",
+      ok: false,
+    };
+  refresh();
+  return { ok: true };
 }
 
 function roundOrNull(value: number | null): number | null {

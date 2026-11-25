@@ -43,7 +43,9 @@ async function RideList() {
   const supabase = await createClient();
   const { data: rides, error } = await supabase
     .from("rides")
-    .select("id, started_at, distance_m, moving_time_s, elevation_gain_m, tss")
+    .select(
+      "id, name, started_at, distance_m, moving_time_s, elevation_gain_m, tss",
+    )
     .order("started_at", { ascending: false });
   if (error) {
     console.error(error);
@@ -83,10 +85,18 @@ async function RideList() {
                 className="flex items-center gap-4 rounded-row px-3 py-3 hover:bg-surface-hover"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold">
-                    {formatDate(ride.started_at)}
+                  <p className="truncate text-sm font-semibold">
+                    {ride.name ?? formatDate(ride.started_at)}
                   </p>
                   <p className="mt-0.5 flex flex-wrap gap-x-1.5 text-xs tabular-nums text-muted">
+                    {ride.name && (
+                      <>
+                        <span className="whitespace-nowrap">
+                          {formatDate(ride.started_at)}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                      </>
+                    )}
                     <span className="whitespace-nowrap">
                       {formatDistance(ride.distance_m)}
                     </span>
