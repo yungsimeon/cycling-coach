@@ -20,7 +20,7 @@ export type FitnessDay = {
 const DAYS_FOR_CTL = 42; //CTL represents long-term fitness, calculated as a 42-day exponentially weighted average of daily training load
 const DAYS_FOR_ATL = 7; // ATL represents short-term fatigue, calculated as a 7-day exponentially weighted average
 
-const MS_PER_MINUTE = 60 * 1000;
+export const MS_PER_MINUTE = 60 * 1000;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export function sumDailyLoad(activities: RideTrainingLoad[]): DailyLoad[] {

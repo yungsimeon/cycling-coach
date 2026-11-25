@@ -7,6 +7,7 @@ import {
   formatTss,
 } from "@/lib/format/units";
 import { averageSpeedKmh } from "@/lib/metrics/speed";
+import { defaultRideName } from "@/lib/rides/default-name";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -44,7 +45,7 @@ async function RideList() {
   const { data: rides, error } = await supabase
     .from("rides")
     .select(
-      "id, name, started_at, distance_m, moving_time_s, elevation_gain_m, tss",
+      "id, name, started_at, utc_offset_min, distance_m, moving_time_s, elevation_gain_m, tss",
     )
     .order("started_at", { ascending: false });
   if (error) {
@@ -86,17 +87,17 @@ async function RideList() {
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">
-                    {ride.name ?? formatDate(ride.started_at)}
+                    {ride.name ??
+                      defaultRideName(
+                        new Date(ride.started_at),
+                        ride.utc_offset_min,
+                      )}
                   </p>
                   <p className="mt-0.5 flex flex-wrap gap-x-1.5 text-xs tabular-nums text-muted">
-                    {ride.name && (
-                      <>
-                        <span className="whitespace-nowrap">
-                          {formatDate(ride.started_at)}
-                        </span>
-                        <span aria-hidden="true">·</span>
-                      </>
-                    )}
+                    <span className="whitespace-nowrap">
+                      {formatDate(ride.started_at)}
+                    </span>
+                    <span aria-hidden="true">·</span>
                     <span className="whitespace-nowrap">
                       {formatDistance(ride.distance_m)}
                     </span>

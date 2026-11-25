@@ -20,6 +20,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { card, errorText, label, page } from "@/components/ui/styles";
 import RideHeader from "./ride-header";
+import { defaultRideName } from "@/lib/rides/default-name";
 
 export default function RideDetailPage({ params }: PageProps<"/rides/[id]">) {
   return (
@@ -67,12 +68,11 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
         id={ride.id}
         name={ride.name}
         description={ride.description}
-        fallbackTitle={formatDate(ride.started_at)}
-        subtitle={
-          ride.name
-            ? `${formatDate(ride.started_at)} · ${ride.sport}`
-            : ride.sport
-        }
+        fallbackTitle={defaultRideName(
+          new Date(ride.started_at),
+          ride.utc_offset_min,
+        )}
+        subtitle={`${formatDate(ride.started_at)} · ${ride.sport}`}
       />
 
       <Section title="Overview">
