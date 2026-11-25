@@ -5,12 +5,11 @@ this file holds the details. Order within a section is rough priority.
 
 **Legend:** 🔜 next up · ⏳ needs something else first (see "needs") · 💡 idea, not decided yet
 
-## Ride metrics (in progress)
+## Ride metrics
 
-- 🔜 Save `avg_hr`, `peak_hr`, `peak_power` on upload (functions exist, wire into `calculateRideMetrics` + upload action; null out implausible HR instead of failing the upload)
-- 🔜 `peak_speed_mps` (GPS spike filter, ~120 km/h limit) and `avg_cadence`
-- 🔜 HR zones (Coggan, % of LTHR) + `time_in_hr_zones`
-- 🔜 hrTSS for rides without power; CTL uses power TSS, falls back to hrTSS
+- ✅ `avg_hr`, `peak_hr`, `peak_power`, `peak_speed_mps`, `avg_cadence` saved on upload
+- ✅ HR zones + `time_in_hr_zones`, hrTSS for rides without power (CTL falls back to hrTSS)
+- 💡 hrTSS vs. power TSS differ by ~30 % on rides with both: check thresholds / consider per-user calibration
 - **Best efforts (power curve):** best average power for 15s, 30s, 1, 2, 3, 5, 8, 10, 15, 20, 30, 45 min, 1h per ride (probably its own table, one row per ride and duration)
   - All-time and last-90-days bests, "new personal best!" on the ride page
   - Power curve chart (your best efforts vs. a chosen period)
@@ -32,7 +31,11 @@ this file holds the details. Order within a section is rough priority.
 
 ## Fitness tracking
 
-- CTL / ATL / TSB (fitness, fatigue, form) per day, chart over time
+- ✅ CTL / ATL / TSB (fitness, fatigue, form) per day, chart on the dashboard
+- 🔜 **Explain the curves in plain language (rules, no AI):** form ranges (fresh / productive / overreaching), fitness trend over the last 4 weeks, ramp rate. Plain TS in `src/lib/`; later the input for the AI coach
+- **Health log:** sick / injured / travel periods (start, optional end, type, note). Shaded on the fitness chart; context for the AI coach and plan adaptation
+- 💡 Dedicated /fitness page with time ranges (6 weeks, 1 year, all)
+- 💡 "Today" in the user's time zone instead of UTC
 - Ramp-rate warning when fitness climbs too fast (injury/overtraining risk)
 - Weekly summary: hours, TSS, distance, compared with previous weeks
 - Calendar view of past rides and planned workouts
@@ -63,7 +66,7 @@ this file holds the details. Order within a section is rough priority.
 
 - AI ride rating (roadmap phase 5): prompts, evals, guardrails, cost limits
 - AI workout suggestions / plan adaptation (phase 6)
-- Explain the "why" in plain language ("easy day today because your fatigue is high")
+- Explain the "why" in plain language ("easy day today because your fatigue is high"); builds on the rule-based fitness explanation, ride names/notes and the health log
 - 💡 Chat with the coach about your training
 
 ## Rides & maps
@@ -71,14 +74,18 @@ this file holds the details. Order within a section is rough priority.
 - Map of each ride (simplified route stored at upload, dark map tiles)
 - **Privacy zones:** hide the start/end around home
 - Delete a ride from the UI (DB policy exists already)
-- Duplicate upload protection (same start time → "already uploaded")
-- Bulk upload (several FIT files at once)
+- 🔜 **Ride name and description:** editable on the ride page (first update action + RLS update policy); default name from time of day ("Morning ride")
+- ✅ Duplicate upload protection (unique `user_id, started_at`)
+- ✅ Bulk upload (several FIT files at once, one request per file)
+- Reject non-cycling activities (runs) until running is supported
+- 💡 Running support: own thresholds (running LTHR, threshold pace), pace display
 - Charts on the ride page: power, HR, speed, elevation over time
 - Laps / auto-detected intervals on the ride page
 
 ## Integrations
 
 - Strava import (OAuth + webhooks for new rides)
+- Wahoo Cloud API (OAuth + `workout_summary` webhook with FIT file; needs deploy + app approval)
 - intervals.icu / Garmin Connect
 - 💡 Push planned workouts to Garmin/Wahoo directly
 
@@ -94,7 +101,7 @@ this file holds the details. Order within a section is rough priority.
 
 - Automated tests (Vitest) for `src/lib/` — turn the ad-hoc test scripts into real tests
 - `FitParseError` custom error class
-- Raise `serverActions.bodySizeLimit` for long rides
+- ✅ Raise `serverActions.bodySizeLimit` for long rides (5 MB)
 - Zone percentage helper in `zones.ts`
 - Min password length 8, nicer `?error=google` message on login
 - Update Supabase CLI (v2 → v3)

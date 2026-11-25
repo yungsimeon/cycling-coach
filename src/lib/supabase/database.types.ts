@@ -61,6 +61,7 @@ export type Database = {
           avg_hr: number | null
           avg_power: number | null
           created_at: string
+          description: string | null
           distance_m: number | null
           elevation_gain_m: number | null
           fit_file_path: string
@@ -71,6 +72,7 @@ export type Database = {
           lthr: number | null
           lthr_estimated: boolean | null
           moving_time_s: number
+          name: string | null
           normalized_power: number | null
           peak_hr: number | null
           peak_power: number | null
@@ -89,6 +91,7 @@ export type Database = {
           avg_hr?: number | null
           avg_power?: number | null
           created_at?: string
+          description?: string | null
           distance_m?: number | null
           elevation_gain_m?: number | null
           fit_file_path: string
@@ -99,6 +102,7 @@ export type Database = {
           lthr?: number | null
           lthr_estimated?: boolean | null
           moving_time_s: number
+          name?: string | null
           normalized_power?: number | null
           peak_hr?: number | null
           peak_power?: number | null
@@ -117,6 +121,7 @@ export type Database = {
           avg_hr?: number | null
           avg_power?: number | null
           created_at?: string
+          description?: string | null
           distance_m?: number | null
           elevation_gain_m?: number | null
           fit_file_path?: string
@@ -127,6 +132,7 @@ export type Database = {
           lthr?: number | null
           lthr_estimated?: boolean | null
           moving_time_s?: number
+          name?: string | null
           normalized_power?: number | null
           peak_hr?: number | null
           peak_power?: number | null
