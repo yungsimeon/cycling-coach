@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   experimental: {
     agentUpgrade: "security",
+    serverActions: {
+      // One FIT file per request. Long rides can exceed the 1 MB default
+      // (a 7 h ride is ~1 MB); 5 MB leaves plenty of room.
+      bodySizeLimit: "5mb",
+    },
   },
   turbopack: {
     rules: {

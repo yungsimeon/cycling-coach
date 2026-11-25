@@ -14,6 +14,9 @@ import { formatDate } from "@/lib/format/units";
 // One row per chosen file. The browser sends the files one at a time
 // (each request stays under the 1 MB server action limit), so every file
 // gets its own result.
+// Matches serverActions.bodySizeLimit in next.config.ts (minus room for form overhead).
+const MAX_FILE_BYTES = 5 * 1024 * 1024 - 100 * 1024;
+
 type Item = {
   file: File;
   status: "waiting" | "uploading" | "done" | "error";
@@ -49,6 +52,13 @@ export default function UploadRideForm() {
     const files = items.map((item) => item.file);
     startTransition(async () => {
       for (const [index, file] of files.entries()) {
+        if (file.size > MAX_FILE_BYTES) {
+          updateItem(index, {
+            status: "error",
+            message: "File is too large (max 5 MB).",
+          });
+          continue;
+        }
         updateItem(index, { status: "uploading" });
         const formData = new FormData();
         formData.append("file", file);
