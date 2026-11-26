@@ -71,10 +71,13 @@ this file holds the details. Order within a section is rough priority.
 
 ## Rides & maps
 
-- Map of each ride (simplified route stored at upload, dark map tiles)
+- ✅ Map of each ride (Douglas–Peucker route, 5 m tolerance, stored at upload + backfill script; Leaflet with Esri dark tiles)
+- ✅ Map styles: dark with terrain shading (default), Topo, Satellite; choice remembered per browser
+- **Elevation profile:** chart under the map (distance → altitude) to see climbs at a glance. Needs altitude per point from the FIT samples, a simplified profile stored at upload (new column + backfill, same pattern as `route`), then the chart. Later: hover on the chart highlights the spot on the map; gradient colours on steep parts
+- **Map tiles before deploying:** Esri's keyless tiles are fine for dev; check their terms or switch to a keyed provider (CARTO, Stadia, MapTiler) once the app is public
 - **Privacy zones:** hide the start/end around home
 - Delete a ride from the UI (DB policy exists already)
-- 🔜 **Ride name and description:** editable on the ride page (first update action + RLS update policy); default name from time of day ("Morning ride")
+- ✅ **Ride name and description:** editable on the ride page (first update action + RLS update policy); default name from time of day ("Morning ride")
 - ✅ Duplicate upload protection (unique `user_id, started_at`)
 - ✅ Bulk upload (several FIT files at once, one request per file)
 - Reject non-cycling activities (runs) until running is supported

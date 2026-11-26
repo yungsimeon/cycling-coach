@@ -21,6 +21,8 @@ import { Suspense } from "react";
 import { card, errorText, label, page } from "@/components/ui/styles";
 import RideHeader from "./ride-header";
 import { defaultRideName } from "@/lib/rides/default-name";
+import type { LatLng } from "@/lib/rides/route";
+import RideMap from "./ride-map";
 
 export default function RideDetailPage({ params }: PageProps<"/rides/[id]">) {
   return (
@@ -61,6 +63,7 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
   if (ride === null) notFound();
   const powerZones = ride.time_in_zones as ZoneTime[] | null;
   const hrZones = ride.time_in_hr_zones as ZoneTime[] | null;
+  const route = ride.route as LatLng[] | null;
 
   return (
     <div className="mt-2 flex flex-col gap-6">
@@ -74,6 +77,8 @@ async function RideDetails({ params }: { params: Promise<{ id: string }> }) {
         )}
         subtitle={`${formatDate(ride.started_at)} · ${ride.sport}`}
       />
+
+      {route && <RideMap route={route} />}
 
       <Section title="Overview">
         <Stat label="Distance" value={formatDistance(ride.distance_m)} />
