@@ -4,6 +4,7 @@ import { parseFit } from "@/lib/fit/parse";
 import type { Ride } from "@/lib/fit/types";
 import { thresholdHr } from "@/lib/metrics/heart-rate";
 import { calculateRideMetrics } from "@/lib/metrics/ride-metrics";
+import { rideRoute } from "@/lib/rides/route";
 import { updateRideSchema } from "@/lib/rides/schema";
 import { createClient } from "@/lib/supabase/server";
 import { refresh, revalidatePath } from "next/cache";
@@ -100,6 +101,7 @@ export async function uploadRide(
     time_in_hr_zones: rideMetrics.timeInHrZones,
     fit_file_path: path,
     utc_offset_min: ride.utcOffsetMin,
+    route: rideRoute(ride.samples),
   });
   if (insertError) {
     console.error(insertError);

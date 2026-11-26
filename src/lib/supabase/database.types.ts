@@ -77,6 +77,7 @@ export type Database = {
           peak_hr: number | null
           peak_power: number | null
           peak_speed_mps: number | null
+          route: Json | null
           sport: string
           started_at: string
           time_in_hr_zones: Json | null
@@ -107,6 +108,7 @@ export type Database = {
           peak_hr?: number | null
           peak_power?: number | null
           peak_speed_mps?: number | null
+          route?: Json | null
           sport: string
           started_at: string
           time_in_hr_zones?: Json | null
@@ -137,6 +139,7 @@ export type Database = {
           peak_hr?: number | null
           peak_power?: number | null
           peak_speed_mps?: number | null
+          route?: Json | null
           sport?: string
           started_at?: string
           time_in_hr_zones?: Json | null
