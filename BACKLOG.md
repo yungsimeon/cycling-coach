@@ -81,9 +81,10 @@ this file holds the details. Order within a section is rough priority.
 - ✅ Duplicate upload protection (unique `user_id, started_at`)
 - ✅ Bulk upload (several FIT files at once, one request per file)
 - Reject non-cycling activities (runs) until running is supported
-- 💡 Running support: own thresholds (running LTHR, threshold pace), pace display
+- **Running support (for fatigue first):** runs count towards ATL/CTL via hrTSS with a separate running LTHR (usually a few bpm above cycling). Later: threshold pace, pace display, running zones
 - Charts on the ride page: power, HR, speed, elevation over time
-- Laps / auto-detected intervals on the ride page
+- **Laps (Strava-style, see `fixtures/inspo/IMG_0286.PNG`):** bars with width = lap duration and height = avg power, elevation profile shaded behind, selected lap highlighted; table below (lap, distance, time, avg power, avg HR), chart and table linked. Needs: a `laps` jsonb column with per-lap stats computed from samples at upload + backfill (laps are already parsed in `parseFit`). Build next to the elevation profile (both use `altitudeM`)
+- 💡 Auto-detected intervals (for rides without manual laps)
 
 ## Integrations
 
