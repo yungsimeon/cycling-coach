@@ -16,6 +16,7 @@ import {
   pageTitle,
 } from "@/components/ui/styles";
 import FitnessChart from "@/components/fitness-chart";
+import { FORM_ZONES, formZone } from "@/lib/metrics/form";
 import { formatDay, formatSigned } from "@/lib/format/units";
 
 const CHART_DAYS = 90;
@@ -123,6 +124,8 @@ async function Fitness() {
         />
       </div>
 
+      <FormToday tsb={today.tsb} />
+
       <div className={card}>
         <div className="mb-4 flex items-baseline justify-between gap-4">
           <p className={label}>Fitness over time</p>
@@ -193,6 +196,80 @@ function FitnessStat({
   );
 }
 
+// Visible range of the form scale. Purely visual: values outside are pinned to the edge.
+const SCALE_MIN = -50;
+const SCALE_MAX = 40;
+
+// Today's form zone in words, plus a scale showing where today's TSB sits among the zones.
+function FormToday({ tsb }: { tsb: number }) {
+  // Use the rounded value (the one the stat card shows), so number and zone always agree.
+  const rounded = Math.round(tsb);
+  const zone = formZone(rounded);
+
+  // FORM_ZONES runs from high to low TSB; the scale reads left (low) to right (high).
+  // Each zone ends where the zone above it starts.
+  const segments = FORM_ZONES.map((z, i) => ({
+    zone: z,
+    from: Math.max(z.minTSB, SCALE_MIN),
+    to: i === 0 ? SCALE_MAX : Math.min(FORM_ZONES[i - 1].minTSB, SCALE_MAX),
+  })).reverse();
+  const toPercent = (value: number) =>
+    ((Math.min(Math.max(value, SCALE_MIN), SCALE_MAX) - SCALE_MIN) /
+      (SCALE_MAX - SCALE_MIN)) *
+    100;
+
+  return (
+    <div className={card}>
+      <p className={label}>Form today</p>
+      <p className="mt-2 flex items-baseline gap-2">
+        <span className="text-lg font-semibold">{zone.label}</span>
+        <span className="text-sm tabular-nums text-muted">
+          TSB {formatSigned(rounded)}
+        </span>
+      </p>
+      <p className="mt-1 text-sm text-fg/90">{zone.meaning}</p>
+
+      {/* The words above carry the meaning; the scale is a visual aid only. */}
+      <div className="mt-5" aria-hidden="true">
+        <div className="relative">
+          <div className="flex h-2 gap-0.5">
+            {segments.map((s) => (
+              <div
+                key={s.zone.id}
+                className={`h-full first:rounded-l-full last:rounded-r-full ${
+                  s.zone.id === zone.id ? "bg-fg" : "bg-line-strong"
+                }`}
+                style={{ width: `${toPercent(s.to) - toPercent(s.from)}%` }}
+              />
+            ))}
+          </div>
+          <div
+            className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface bg-accent"
+            style={{ left: `${toPercent(rounded)}%` }}
+          />
+        </div>
+        <div className="mt-2 flex gap-0.5">
+          {segments.map((s) => (
+            <p
+              key={s.zone.id}
+              className={`truncate text-center text-2xs ${
+                s.zone.id === zone.id ? "font-semibold text-fg" : "text-muted"
+              }`}
+              style={{ width: `${toPercent(s.to) - toPercent(s.from)}%` }}
+            >
+              {s.zone.label}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-4 text-xs text-muted">
+        Zones are coaching rules of thumb, not a diagnosis.
+      </p>
+    </div>
+  );
+}
+
 function FitnessSkeleton() {
   return (
     <div className="flex flex-col gap-3" aria-busy="true">
@@ -201,6 +278,7 @@ function FitnessSkeleton() {
           <div key={i} className={`${card} h-24 animate-pulse`} />
         ))}
       </div>
+      <div className={`${card} h-44 animate-pulse`} />
       <div className={`${card} h-80 animate-pulse`} />
     </div>
   );
